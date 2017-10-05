@@ -8,6 +8,7 @@
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/assert.hpp>
+#include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <iostream>
 
 namespace fun { namespace ast { namespace
@@ -20,8 +21,9 @@ namespace fun { namespace ast { namespace
     {
         typedef void result_type;
 
-        printer(std::ostream& out)
+        printer(std::ostream& out, parser::error_handler_type& eh_)
             : out(out)
+            , eh(eh_)
         {}
 
         void operator()(ast::nil) const { BOOST_ASSERT(0); }
@@ -32,7 +34,20 @@ namespace fun { namespace ast { namespace
         void operator()(ast::function_call const& ast) const;
 
         std::ostream& out;
+        parser::error_handler_type eh;
+
+        void annotate(x3::position_tagged const& ast) const;
     };
+
+    void printer::annotate(x3::position_tagged const& ast) const
+    {
+        if(ast.id_first >= 0) {
+            auto pos { eh.position_of(ast) };
+            out << " [" << pos << ']';
+        }
+        else
+            out << " []";
+    }
     // AST_PRINTER1_VISIT_END
 
     // AST_PRINTER2_VISIT_BEGIN
@@ -43,6 +58,7 @@ namespace fun { namespace ast { namespace
 
     void printer::operator()(ast::operation const& ast) const
     {
+        annotate(ast);
         switch (ast.operator_)
         {
             case '+': out << " + "; break;
@@ -75,6 +91,7 @@ namespace fun { namespace ast { namespace
     // AST_PRINTER3_VISIT_BEGIN
     void printer::operator()(ast::expression const& ast) const
     {
+        annotate(ast);
         if (ast.rest.size())
             out << '(';
         boost::apply_visitor(*this, ast.first);
@@ -109,10 +126,12 @@ namespace fun { namespace ast { namespace
 
 namespace fun { namespace ast
 {
-    void print(std::ostream& out, ast::expression const& ast)
+    void print(std::ostream& out, ast::expression const& ast, parser::error_handler_type& eh)
     {
-        printer p(out);
+        printer p(out, eh);
         p(ast);
         out << std::endl;
     }
 }}
+
+// vim:sw=4

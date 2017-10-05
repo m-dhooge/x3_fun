@@ -8,11 +8,12 @@
 #define BOOST_SPIRIT_X3_FUN_PRINTER_HPP
 
 #include <ostream>
+#include "config.hpp"
 #include "ast.hpp"
 
 namespace fun { namespace ast
 {
-    void print(std::ostream& out, ast::expression const& ast);
+    void print(std::ostream& out, ast::expression const& ast, parser::error_handler_type& eh);
 }}
 
 #endif
