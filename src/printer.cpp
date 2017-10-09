@@ -36,17 +36,18 @@ namespace fun { namespace ast { namespace
         std::ostream& out;
         parser::error_handler_type eh;
 
-        void annotate(x3::position_tagged const& ast) const;
+        void annotate(const char* prefix, x3::position_tagged const& ast) const;
     };
 
-    void printer::annotate(x3::position_tagged const& ast) const
+    void printer::annotate(const char* prefix, x3::position_tagged const& ast) const
     {
+        out << " [" << prefix << ':';
         if(ast.id_first >= 0) {
             auto pos { eh.position_of(ast) };
-            out << " [" << pos << ']';
+            out << pos << ']';
         }
         else
-            out << " []";
+            out << ']';
     }
     // AST_PRINTER1_VISIT_END
 
@@ -58,7 +59,7 @@ namespace fun { namespace ast { namespace
 
     void printer::operator()(ast::operation const& ast) const
     {
-        annotate(ast);
+        annotate("operation", ast);
         switch (ast.operator_)
         {
             case '+': out << " + "; break;
@@ -91,7 +92,7 @@ namespace fun { namespace ast { namespace
     // AST_PRINTER3_VISIT_BEGIN
     void printer::operator()(ast::expression const& ast) const
     {
-        annotate(ast);
+        annotate("expression", ast);
         if (ast.rest.size())
             out << '(';
         boost::apply_visitor(*this, ast.first);
