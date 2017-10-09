@@ -132,8 +132,8 @@ namespace fun { namespace parser
     // EXPRESSION_DEF6_VISIT_END
 
     // EXPRESSION_DEF7_VISIT_BEGIN
-    struct unary_expr_class : x3::annotate_on_success {};
-    struct primary_expr_class : x3::annotate_on_success {};
+    // No effect when uncommented: struct additive_expr_class : x3::annotate_on_success {};
+    struct multiplicative_expr_class : x3::annotate_on_success {};
     struct function_call_class : x3::annotate_on_success {};
 
     struct expression_class : x3::annotate_on_success, error_handler_base {};
