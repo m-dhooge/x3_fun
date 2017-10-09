@@ -1,0 +1,4 @@
+In file <%.*?EOL_is_CRLF.input%>, line 4:
+Error! Expecting end of input here:
+4 + 5
+^_
